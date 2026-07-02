@@ -538,3 +538,61 @@ body.fullscreen-mode .reader-card {
     min-height: 60vh;
   }
 }
+
+/* GitHub 書庫設定 */
+.github-config-box {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(215, 185, 142, 0.10);
+  margin-bottom: 14px;
+}
+
+.two-col-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.github-actions {
+  margin-top: 10px;
+}
+
+.wide-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* 避免「上一章 / 下一章」工具列浮在文字上方造成遮蓋 */
+.reader-toolbar {
+  position: static;
+  top: auto;
+  z-index: 1;
+  margin-bottom: 18px;
+  padding: 0;
+}
+
+.reader-card {
+  scroll-margin-top: 18px;
+}
+
+body.fullscreen-mode .reader-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 10px 14px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+body.fullscreen-mode .reader-card {
+  padding-top: clamp(36px, 5vw, 76px);
+}
+
+@media (max-width: 640px) {
+  .two-col-fields,
+  .save-actions {
+    grid-template-columns: 1fr;
+  }
+}

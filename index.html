@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>本機小說閱讀器</title>
+  <title>GitHub 小說閱讀器</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="site-header">
     <div>
-      <h1>本機小說閱讀器</h1>
-      <p>選擇電腦中的 TXT / DOCX / EPUB 小說檔案，自動建立章節列表，並可保存到本機書庫。</p>
+      <h1>GitHub 小說閱讀器</h1>
+      <p>選擇電腦中的 TXT / DOCX / EPUB 小說檔案，自動建立章節列表，並可保存到 GitHub 書庫。</p>
     </div>
     <button id="themeToggle" class="ghost-btn" type="button">深色模式</button>
   </header>
@@ -50,10 +50,41 @@
 
         <section class="panel save-panel collapsible-panel" data-panel="save">
           <div class="panel-title-row">
-            <h2>保存 / 書庫</h2>
+            <h2>GitHub 保存 / 書庫</h2>
             <button class="mini-btn panel-collapse-btn" type="button" data-toggle-panel="save" aria-expanded="true">▾</button>
           </div>
           <div class="panel-body">
+            <div class="github-config-box">
+              <label class="form-row">
+                GitHub 帳號 / 組織
+                <input id="githubOwnerInput" class="text-input" type="text" placeholder="例如：your-name" spellcheck="false" />
+              </label>
+              <label class="form-row">
+                Repository
+                <input id="githubRepoInput" class="text-input" type="text" placeholder="例如：my-novel-reader" spellcheck="false" />
+              </label>
+              <div class="two-col-fields">
+                <label class="form-row">
+                  Branch
+                  <input id="githubBranchInput" class="text-input" type="text" value="main" placeholder="main" spellcheck="false" />
+                </label>
+                <label class="form-row">
+                  資料資料夾
+                  <input id="githubPathInput" class="text-input" type="text" value="novel-library" placeholder="novel-library" spellcheck="false" />
+                </label>
+              </div>
+              <label class="form-row">
+                GitHub Token
+                <input id="githubTokenInput" class="text-input" type="password" placeholder="用於寫入 repository" autocomplete="off" spellcheck="false" />
+              </label>
+              <div class="save-actions github-actions">
+                <button id="saveGithubSettingsButton" type="button">保存 GitHub 設定</button>
+                <button id="loadGithubLibraryButton" type="button">讀取 GitHub 書庫</button>
+              </div>
+              <button id="clearGithubTokenButton" class="danger-btn wide-btn" type="button">清除本機 Token</button>
+              <p id="githubStatusText" class="hint">小說資料會寫入指定 repository 的資料資料夾。Token 只會保存在目前瀏覽器，不會寫入 GitHub。</p>
+            </div>
+
             <label class="form-row">
               保存名稱
               <input id="saveTitleInput" class="text-input" type="text" placeholder="例如：美母騎士 1-31" />
@@ -64,7 +95,7 @@
               <datalist id="categoryOptions"></datalist>
             </label>
             <div class="save-actions">
-              <button id="saveBookButton" type="button">保存</button>
+              <button id="saveBookButton" type="button">保存到 GitHub</button>
               <button id="saveAsBookButton" type="button">另存新書</button>
             </div>
 
@@ -76,7 +107,7 @@
             </label>
 
             <div id="savedBookList" class="saved-book-list" aria-label="已保存小說列表"></div>
-            <p class="hint">保存資料會存放在目前瀏覽器的 IndexedDB 本機儲存空間；清除瀏覽器網站資料後可能會消失。</p>
+            <p class="hint">同一個 GitHub repository 可在不同電腦或瀏覽器讀取。私人 repository 需要輸入有權限的 Token 才能讀取和寫入。</p>
           </div>
         </section>
 
@@ -95,7 +126,7 @@
               <input id="lineHeightRange" type="range" min="1.4" max="2.8" step="0.1" value="1.8" />
             </label>
             <label class="form-row checkbox-row">
-              <input id="autoFillToggle" type="checkbox" checked />
+              <input id="autoFillToggle" type="checkbox" />
               自動填滿內容寬度
             </label>
             <label class="form-row checkbox-row">
@@ -122,7 +153,7 @@
     </aside>
 
     <section class="reader-wrap">
-      <div class="reader-toolbar">
+      <div class="reader-toolbar" aria-label="閱讀工具列">
         <button id="prevChapter" type="button">上一章</button>
         <button id="nextChapter" type="button">下一章</button>
         <button id="copyChapter" type="button">複製目前章節</button>
@@ -133,7 +164,7 @@
         <h2 id="bookTitle">請先選擇小說檔案</h2>
         <h3 id="chapterTitle">等待載入</h3>
         <div id="readerContent" class="reader-content">
-          支援格式：TXT、DOCX、EPUB。檔案只會在你的瀏覽器內讀取，不會上傳到網絡。載入後可以按「保存」，下次直接從左側書庫打開。
+          支援格式：TXT、DOCX、EPUB。檔案會先在你的瀏覽器內讀取；按「保存到 GitHub」後，小說內容會寫入你指定的 GitHub repository。
         </div>
       </article>
     </section>
