@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>本機小說閱讀器</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <h1>本機小說閱讀器</h1>
+      <p>選擇電腦中的 TXT / DOCX / EPUB 小說檔案，自動建立章節列表。</p>
+    </div>
+    <button id="themeToggle" class="ghost-btn" type="button">深色模式</button>
+  </header>
+
+  <main class="app-shell">
+    <aside class="sidebar">
+      <section class="panel upload-panel">
+        <h2>載入小說</h2>
+        <label class="file-picker">
+          <input id="fileInput" type="file" accept=".txt,.doc,.docx,.epub,text/plain,application/epub+zip,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+          <span>選擇小說檔案</span>
+        </label>
+
+        <label class="form-row">
+          TXT 編碼
+          <select id="encodingSelect">
+            <option value="utf-8">UTF-8</option>
+            <option value="big5">繁體中文 Big5</option>
+            <option value="gb18030">簡體中文 GB18030</option>
+          </select>
+        </label>
+
+        <p id="statusText" class="status-text">尚未選擇檔案。</p>
+        <p class="hint">提示：Word 建議使用 .docx；舊式 .doc 需要先轉成 .docx 或 txt。</p>
+      </section>
+
+      <section class="panel controls-panel">
+        <h2>閱讀設定</h2>
+        <label class="form-row">
+          字體大小
+          <input id="fontSizeRange" type="range" min="14" max="28" value="18" />
+        </label>
+        <label class="form-row">
+          行距
+          <input id="lineHeightRange" type="range" min="1.4" max="2.4" step="0.1" value="1.8" />
+        </label>
+        <label class="form-row checkbox-row">
+          <input id="fullBookToggle" type="checkbox" />
+          顯示全文模式
+        </label>
+      </section>
+
+      <section class="panel chapter-panel">
+        <div class="panel-title-row">
+          <h2>章節列表</h2>
+          <span id="chapterCount" class="badge">0</span>
+        </div>
+        <input id="chapterSearch" class="chapter-search" type="search" placeholder="搜尋章節名稱..." />
+        <nav id="chapterList" class="chapter-list" aria-label="章節列表"></nav>
+      </section>
+    </aside>
+
+    <section class="reader-wrap">
+      <div class="reader-toolbar">
+        <button id="prevChapter" type="button">上一章</button>
+        <button id="nextChapter" type="button">下一章</button>
+        <button id="copyChapter" type="button">複製目前章節</button>
+      </div>
+
+      <article class="reader-card">
+        <h2 id="bookTitle">請先選擇小說檔案</h2>
+        <h3 id="chapterTitle">等待載入</h3>
+        <div id="readerContent" class="reader-content">
+          支援格式：TXT、DOCX、EPUB。檔案只會在你的瀏覽器內讀取，不會上傳到網絡。
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>適合部署到 GitHub Pages / Cloudflare Pages / Netlify 等純靜態網站平台。</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
