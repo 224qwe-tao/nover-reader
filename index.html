@@ -10,81 +10,119 @@
   <header class="site-header">
     <div>
       <h1>本機小說閱讀器</h1>
-      <p>選擇電腦中的 TXT / DOCX / EPUB 小說檔案，自動建立章節列表。</p>
+      <p>選擇電腦中的 TXT / DOCX / EPUB 小說檔案，自動建立章節列表，並可保存到本機書庫。</p>
     </div>
     <button id="themeToggle" class="ghost-btn" type="button">深色模式</button>
   </header>
 
   <main id="appShell" class="app-shell">
-    <aside id="sidebar" class="sidebar">
-      <section class="panel upload-panel collapsible-panel" data-panel="upload">
-        <div class="panel-title-row">
-          <h2>載入小說</h2>
-          <button class="mini-btn panel-collapse-btn" type="button" data-toggle-panel="upload">收起</button>
-        </div>
-        <div class="panel-body">
-          <label class="file-picker">
-            <input id="fileInput" type="file" accept=".txt,.doc,.docx,.epub,text/plain,application/epub+zip,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-            <span>選擇小說檔案</span>
-          </label>
+    <aside id="sidebar" class="sidebar" aria-label="左側工具欄">
+      <div class="sidebar-rail">
+        <button id="sidebarToggle" class="sidebar-toggle-btn" type="button" aria-expanded="true" title="收起左側">☰</button>
+        <span class="rail-label">書庫</span>
+      </div>
 
-          <label class="form-row">
-            TXT 編碼
-            <select id="encodingSelect">
-              <option value="utf-8">UTF-8</option>
-              <option value="big5">繁體中文 Big5</option>
-              <option value="gb18030">簡體中文 GB18030</option>
-            </select>
-          </label>
-
-          <p id="statusText" class="status-text">尚未選擇檔案。</p>
-          <p class="hint">提示：Word 建議使用 .docx；舊式 .doc 需要先轉成 .docx 或 txt。</p>
-        </div>
-      </section>
-
-      <section class="panel controls-panel collapsible-panel" data-panel="controls">
-        <div class="panel-title-row">
-          <h2>閱讀設定</h2>
-          <button class="mini-btn panel-collapse-btn" type="button" data-toggle-panel="controls">收起</button>
-        </div>
-        <div class="panel-body">
-          <label class="form-row">
-            字體大小
-            <input id="fontSizeRange" type="range" min="14" max="32" value="18" />
-          </label>
-          <label class="form-row">
-            行距
-            <input id="lineHeightRange" type="range" min="1.4" max="2.6" step="0.1" value="1.8" />
-          </label>
-          <label class="form-row checkbox-row">
-            <input id="autoFillToggle" type="checkbox" checked />
-            自動填滿內容寬度
-          </label>
-          <label class="form-row checkbox-row">
-            <input id="fullBookToggle" type="checkbox" />
-            顯示全文模式
-          </label>
-        </div>
-      </section>
-
-      <section class="panel chapter-panel collapsible-panel" data-panel="chapters">
-        <div class="panel-title-row">
-          <h2>章節列表</h2>
-          <div class="title-actions">
-            <span id="chapterCount" class="badge">0</span>
-            <button class="mini-btn panel-collapse-btn" type="button" data-toggle-panel="chapters">收起</button>
+      <div id="sidebarContent" class="sidebar-content">
+        <section class="panel upload-panel collapsible-panel" data-panel="upload">
+          <div class="panel-title-row">
+            <h2>載入小說</h2>
+            <button class="mini-btn panel-collapse-btn" type="button" data-toggle-panel="upload" aria-expanded="true">▾</button>
           </div>
-        </div>
-        <div class="panel-body">
-          <input id="chapterSearch" class="chapter-search" type="search" placeholder="搜尋章節名稱..." />
-          <nav id="chapterList" class="chapter-list" aria-label="章節列表"></nav>
-        </div>
-      </section>
+          <div class="panel-body">
+            <label class="file-picker">
+              <input id="fileInput" type="file" accept=".txt,.doc,.docx,.epub,text/plain,application/epub+zip,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+              <span>選擇小說檔案</span>
+            </label>
+
+            <label class="form-row">
+              TXT 編碼
+              <select id="encodingSelect">
+                <option value="utf-8">UTF-8</option>
+                <option value="big5">繁體中文 Big5</option>
+                <option value="gb18030">簡體中文 GB18030</option>
+              </select>
+            </label>
+
+            <p id="statusText" class="status-text">尚未選擇檔案。</p>
+            <p class="hint">提示：Word 建議使用 .docx；舊式 .doc 需要先轉成 .docx 或 txt。</p>
+          </div>
+        </section>
+
+        <section class="panel save-panel collapsible-panel" data-panel="save">
+          <div class="panel-title-row">
+            <h2>保存 / 書庫</h2>
+            <button class="mini-btn panel-collapse-btn" type="button" data-toggle-panel="save" aria-expanded="true">▾</button>
+          </div>
+          <div class="panel-body">
+            <label class="form-row">
+              保存名稱
+              <input id="saveTitleInput" class="text-input" type="text" placeholder="例如：美母騎士 1-31" />
+            </label>
+            <label class="form-row">
+              分類
+              <input id="saveCategoryInput" class="text-input" type="text" placeholder="例如：奇幻、學習、未分類" list="categoryOptions" />
+              <datalist id="categoryOptions"></datalist>
+            </label>
+            <div class="save-actions">
+              <button id="saveBookButton" type="button">保存</button>
+              <button id="saveAsBookButton" type="button">另存新書</button>
+            </div>
+
+            <label class="form-row library-filter-row">
+              查看分類
+              <select id="categoryFilter">
+                <option value="__all__">全部分類</option>
+              </select>
+            </label>
+
+            <div id="savedBookList" class="saved-book-list" aria-label="已保存小說列表"></div>
+            <p class="hint">保存資料會存放在目前瀏覽器的 IndexedDB 本機儲存空間；清除瀏覽器網站資料後可能會消失。</p>
+          </div>
+        </section>
+
+        <section class="panel controls-panel collapsible-panel" data-panel="controls">
+          <div class="panel-title-row">
+            <h2>閱讀設定</h2>
+            <button class="mini-btn panel-collapse-btn" type="button" data-toggle-panel="controls" aria-expanded="true">▾</button>
+          </div>
+          <div class="panel-body">
+            <label class="form-row">
+              字體大小
+              <input id="fontSizeRange" type="range" min="14" max="36" value="18" />
+            </label>
+            <label class="form-row">
+              行距
+              <input id="lineHeightRange" type="range" min="1.4" max="2.8" step="0.1" value="1.8" />
+            </label>
+            <label class="form-row checkbox-row">
+              <input id="autoFillToggle" type="checkbox" checked />
+              自動填滿內容寬度
+            </label>
+            <label class="form-row checkbox-row">
+              <input id="fullBookToggle" type="checkbox" />
+              顯示全文模式
+            </label>
+          </div>
+        </section>
+
+        <section class="panel chapter-panel collapsible-panel" data-panel="chapters">
+          <div class="panel-title-row">
+            <h2>章節列表</h2>
+            <div class="title-actions">
+              <span id="chapterCount" class="badge">0</span>
+              <button class="mini-btn panel-collapse-btn" type="button" data-toggle-panel="chapters" aria-expanded="true">▾</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <input id="chapterSearch" class="chapter-search" type="search" placeholder="搜尋章節名稱..." />
+            <nav id="chapterList" class="chapter-list" aria-label="章節列表"></nav>
+          </div>
+        </section>
+      </div>
     </aside>
 
     <section class="reader-wrap">
       <div class="reader-toolbar">
-        <button id="sidebarToggle" type="button">收起左側</button>
         <button id="prevChapter" type="button">上一章</button>
         <button id="nextChapter" type="button">下一章</button>
         <button id="copyChapter" type="button">複製目前章節</button>
@@ -95,7 +133,7 @@
         <h2 id="bookTitle">請先選擇小說檔案</h2>
         <h3 id="chapterTitle">等待載入</h3>
         <div id="readerContent" class="reader-content">
-          支援格式：TXT、DOCX、EPUB。檔案只會在你的瀏覽器內讀取，不會上傳到網絡。
+          支援格式：TXT、DOCX、EPUB。檔案只會在你的瀏覽器內讀取，不會上傳到網絡。載入後可以按「保存」，下次直接從左側書庫打開。
         </div>
       </article>
     </section>
