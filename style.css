@@ -26,6 +26,10 @@ body.dark {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", Arial, sans-serif;
@@ -90,6 +94,16 @@ button:disabled {
   grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
   gap: 22px;
   padding: 0 clamp(18px, 4vw, 48px) 28px;
+  min-height: calc(100vh - 145px);
+  transition: grid-template-columns 0.2s ease;
+}
+
+.app-shell.sidebar-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app-shell.sidebar-collapsed .sidebar {
+  display: none;
 }
 
 .sidebar {
@@ -112,8 +126,23 @@ button:disabled {
 }
 
 .panel h2 {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: 18px;
+}
+
+.panel-body {
+  margin-top: 12px;
+}
+
+.collapsible-panel.collapsed .panel-body {
+  display: none;
+}
+
+.mini-btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .file-picker {
@@ -183,6 +212,12 @@ input[type="range"] {
   gap: 12px;
 }
 
+.title-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .badge {
   display: inline-flex;
   min-width: 34px;
@@ -224,6 +259,8 @@ input[type="range"] {
 
 .reader-wrap {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .reader-toolbar {
@@ -234,8 +271,10 @@ input[type="range"] {
 }
 
 .reader-card {
+  width: 100%;
   padding: clamp(22px, 4vw, 46px);
   min-height: 72vh;
+  flex: 1;
 }
 
 .reader-card h2 {
@@ -250,16 +289,43 @@ input[type="range"] {
 }
 
 .reader-content {
+  width: 100%;
+  max-width: none;
   white-space: pre-wrap;
   line-height: var(--reader-line-height, 1.8);
   font-size: var(--reader-font-size, 18px);
   letter-spacing: 0.02em;
   word-break: break-word;
+  overflow-wrap: anywhere;
+  text-align: justify;
+  text-justify: inter-ideograph;
 }
 
 .site-footer {
   padding: 0 clamp(18px, 4vw, 48px) 32px;
   font-size: 13px;
+}
+
+body.fullscreen-mode {
+  background: var(--bg);
+}
+
+body.fullscreen-mode .site-header,
+body.fullscreen-mode .site-footer {
+  display: none;
+}
+
+body.fullscreen-mode .app-shell {
+  min-height: 100vh;
+  padding: 16px;
+}
+
+body.fullscreen-mode .reader-card {
+  min-height: calc(100vh - 76px);
+}
+
+body.fullscreen-mode .chapter-list {
+  max-height: calc(100vh - 270px);
 }
 
 @media (max-width: 880px) {
@@ -272,7 +338,15 @@ input[type="range"] {
     grid-template-columns: 1fr;
   }
 
+  .app-shell.sidebar-collapsed {
+    grid-template-columns: 1fr;
+  }
+
   .chapter-list {
     max-height: 260px;
+  }
+
+  .reader-card {
+    min-height: 60vh;
   }
 }

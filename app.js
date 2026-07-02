@@ -1,3 +1,4 @@
+const appShell = document.getElementById("appShell");
 const fileInput = document.getElementById("fileInput");
 const encodingSelect = document.getElementById("encodingSelect");
 const statusText = document.getElementById("statusText");
@@ -7,11 +8,14 @@ const chapterSearch = document.getElementById("chapterSearch");
 const bookTitle = document.getElementById("bookTitle");
 const chapterTitle = document.getElementById("chapterTitle");
 const readerContent = document.getElementById("readerContent");
+const sidebarToggle = document.getElementById("sidebarToggle");
 const prevChapter = document.getElementById("prevChapter");
 const nextChapter = document.getElementById("nextChapter");
 const copyChapter = document.getElementById("copyChapter");
+const fullscreenToggle = document.getElementById("fullscreenToggle");
 const fontSizeRange = document.getElementById("fontSizeRange");
 const lineHeightRange = document.getElementById("lineHeightRange");
+const autoFillToggle = document.getElementById("autoFillToggle");
 const fullBookToggle = document.getElementById("fullBookToggle");
 const themeToggle = document.getElementById("themeToggle");
 
@@ -27,10 +31,13 @@ const CHAPTER_GLOBAL_REGEX = /(?:^|\n)\s*(第\s*(?:[0-9０-９]+|[零〇○一�
 
 fileInput.addEventListener("change", handleFileSelect);
 chapterSearch.addEventListener("input", renderChapterList);
+sidebarToggle.addEventListener("click", toggleSidebar);
 prevChapter.addEventListener("click", () => openChapter(currentBook.currentIndex - 1));
 nextChapter.addEventListener("click", () => openChapter(currentBook.currentIndex + 1));
 copyChapter.addEventListener("click", copyCurrentChapter);
-fullBookToggle.addEventListener("change", () => openChapter(currentBook.currentIndex));
+fullscreenToggle.addEventListener("click", toggleFullscreen);
+autoFillToggle.addEventListener("change", () => openChapter(currentBook.currentIndex, false));
+fullBookToggle.addEventListener("change", () => openChapter(currentBook.currentIndex, false));
 fontSizeRange.addEventListener("input", updateReadingStyle);
 lineHeightRange.addEventListener("input", updateReadingStyle);
 themeToggle.addEventListener("click", toggleTheme);
@@ -39,6 +46,12 @@ encodingSelect.addEventListener("change", () => {
     handleFile(fileInput.files[0]);
   }
 });
+
+document.querySelectorAll("[data-toggle-panel]").forEach((button) => {
+  button.addEventListener("click", () => togglePanel(button));
+});
+
+document.addEventListener("fullscreenchange", updateFullscreenState);
 
 updateReadingStyle();
 updateNavButtons();
@@ -82,7 +95,7 @@ async function handleFile(file) {
     chapterCount.textContent = chapters.length;
     chapterSearch.value = "";
     renderChapterList();
-    openChapter(0);
+    openChapter(0, false);
     setStatus(`已載入：${fileName}，偵測到 ${chapters.length} 個章節。`);
   } catch (error) {
     console.error(error);
@@ -268,17 +281,75 @@ function renderChapterList() {
   }
 }
 
-function openChapter(index) {
+function openChapter(index, shouldScroll = true) {
   if (!currentBook.chapters.length) return;
   if (index < 0 || index >= currentBook.chapters.length) return;
 
   currentBook.currentIndex = index;
   const chapter = currentBook.chapters[index];
+  const rawText = fullBookToggle.checked ? currentBook.text : chapter.content;
+
   chapterTitle.textContent = chapter.title || `第 ${index + 1} 章`;
-  readerContent.textContent = fullBookToggle.checked ? currentBook.text : chapter.content;
+  readerContent.textContent = autoFillToggle.checked ? formatForAutoFill(rawText) : rawText;
   renderChapterList();
   updateNavButtons();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  if (shouldScroll) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
+function formatForAutoFill(text) {
+  const lines = text.split("\n");
+  const paragraphs = [];
+  let buffer = [];
+
+  const flushBuffer = () => {
+    if (!buffer.length) return;
+    paragraphs.push(joinParagraphLines(buffer));
+    buffer = [];
+  };
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushBuffer();
+      return;
+    }
+
+    if (CHAPTER_LINE_REGEX.test(trimmed)) {
+      flushBuffer();
+      paragraphs.push(trimmed);
+      return;
+    }
+
+    const looksLikeNewParagraph = /^[\s\u3000]{2,}\S/.test(line) || /^　+\S/.test(line);
+    if (looksLikeNewParagraph && buffer.length) {
+      flushBuffer();
+    }
+
+    buffer.push(trimmed);
+  });
+
+  flushBuffer();
+  return paragraphs.join("\n\n");
+}
+
+function joinParagraphLines(lines) {
+  return lines.reduce((result, line, index) => {
+    if (index === 0) return line;
+    const previousChar = result.slice(-1);
+    const firstChar = line.charAt(0);
+    const needsSpace = shouldInsertSpace(previousChar, firstChar);
+    return result + (needsSpace ? " " : "") + line;
+  }, "");
+}
+
+function shouldInsertSpace(previousChar, firstChar) {
+  if (!previousChar || !firstChar) return false;
+  const cjkOrPunctuation = /[\u3400-\u9fff\uf900-\ufaff，。！？；：「」『』（）《》、…—]/;
+  return !cjkOrPunctuation.test(previousChar) && !cjkOrPunctuation.test(firstChar);
 }
 
 function updateNavButtons() {
@@ -302,6 +373,37 @@ async function copyCurrentChapter() {
 function updateReadingStyle() {
   document.documentElement.style.setProperty("--reader-font-size", `${fontSizeRange.value}px`);
   document.documentElement.style.setProperty("--reader-line-height", lineHeightRange.value);
+}
+
+function toggleSidebar() {
+  appShell.classList.toggle("sidebar-collapsed");
+  sidebarToggle.textContent = appShell.classList.contains("sidebar-collapsed") ? "打開左側" : "收起左側";
+}
+
+function togglePanel(button) {
+  const panelKey = button.dataset.togglePanel;
+  const panel = document.querySelector(`[data-panel="${panelKey}"]`);
+  if (!panel) return;
+  panel.classList.toggle("collapsed");
+  button.textContent = panel.classList.contains("collapsed") ? "打開" : "收起";
+}
+
+async function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (error) {
+    setStatus("瀏覽器未允許全螢幕模式，請確認網頁權限或直接按 F11。");
+  }
+}
+
+function updateFullscreenState() {
+  const isFullscreen = Boolean(document.fullscreenElement);
+  document.body.classList.toggle("fullscreen-mode", isFullscreen);
+  fullscreenToggle.textContent = isFullscreen ? "退出全螢幕" : "全螢幕";
 }
 
 function toggleTheme() {
